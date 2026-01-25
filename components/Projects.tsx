@@ -14,28 +14,28 @@ type Project = {
 
 const projects: Project[] = [
   {
-    name: "Sci-Fi Portfolio",
-    description: "Interactive 3D portfolio built with Next.js, R3F, and GSAP.",
-    image: "/images/project-portfolio.png",
-    tech: ["Next.js", "R3F", "GSAP", "TailwindCSS"],
+    name: "Story weaver - library and article sharing",
+    description: "Innovative online library along with authenticity system and articles sharing.",
+    image: "/openbook.jpg",
+    tech: ["Next.js", "JavaScript", "React", "SASS"],
     demo: "#",
-    github: "#",
+    github: "https://github.com/Anja286/story-weaver.git",
   },
   {
-    name: "Realtime Dashboard",
-    description: "Analytics dashboard with live updates and data visualization.",
-    image: "/images/project-dashboard.png",
-    tech: ["React", "Chart.js", "TypeScript", "Supabase"],
+    name: "MediMate software",
+    description: "Patient care companion.",
+    image: "/medimate.jpeg",
+    tech: ["React", "Node.js", "TypeScript", "Supabase"],
     demo: "#",
-    github: "#",
+    github: "https://github.com/Anja286/patient-care-companion#",
   },
   {
-    name: "Pet Control App",
-    description: "Full-stack app to track pets, vaccinations, and reminders.",
-    image: "/images/project-pet.png",
-    tech: ["Next.js", "TailwindCSS", "Supabase", "Google Maps API"],
+    name: "Learnflix Pro",
+    description: "Full-stack learning app for healthcare providers.",
+    image: "/healthcare.jpeg",
+    tech: ["Next.js", "AWS", "Typescript", "React"],
     demo: "#",
-    github: "#",
+    github: "https://github.com/Anja286/learnflixpro",
   },
 ];
 
@@ -81,7 +81,7 @@ export default function Projects() {
                   src={project.image}
                   alt={project.name}
                   fill
-                  className="object-cover"
+                  className="medimate"
                 />
               </div>
 

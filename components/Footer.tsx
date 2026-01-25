@@ -15,7 +15,7 @@ export default function Footer() {
       {/* Neon top wire */}
       <div className="absolute top-0 left-0 w-full h-px neon-mint-wire" />
 
-      <div className="relative px-6 md:px-12 lg:px-24 py-10 flex flex-col gap-4">
+      <div className="relative px-6 md:px-12 lg:px-20 py-10 flex flex-col gap-2">
         <span className="text-sm text-gray-300">© 2026 All rights reserved.</span>
 
         <div className="h-px w-full bg-[rgba(150,222,209,0.20)]" />
