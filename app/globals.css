@@ -1,26 +1,135 @@
 @import "tailwindcss";
 
+/* =========================================================
+   1. Design Tokens (Sci-Fi Professional Palette)
+   ========================================================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --background: 11 15 26;            /* #0B0F1A */
+  --background-secondary: 17 24 39;  /* #111827 */
+  --background-card: 15 23 42;       /* #0F172A */
+
+ /* Text */
+  --foreground: 229 231 235;         /* #E5E7EB */
+  --foreground-muted: 156 163 175;   /* #9CA3AF */
+
+  /* Accents */
+  --accent-pink: 236 72 153;         /* #EC4899 */
+  --accent-cyan: 34 211 238;         /* #22D3EE */
 }
 
+/* =========================================================
+   2. Tailwind Theme Mapping (v4 style)
+   ========================================================= */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: rgb(var(--background));
+  --color-background-secondary: rgb(var(--background-secondary));
+  --color-background-card: rgb(var(--background-card));
+
+  --color-foreground: rgb(var(--foreground));
+  --color-foreground-muted: rgb(var(--foreground-muted));
+
+  --color-accent-pink: rgb(var(--accent-pink));
+  --color-accent-cyan: rgb(var(--accent-cyan));
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* =========================================================
+   3. Dark Mode Fine-Tuning
+   ========================================================= */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: 243 244 246; /* #F3F4F6 */
+    --foreground-muted: 174 178 183;
   }
 }
 
+/* =========================================================
+   4. Base Styles
+   ========================================================= */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* =========================================================
+   5–6. Semantic utilities + glow utilities (single layer block)
+   ========================================================= */
+@layer utilities {
+  /* ---- Backgrounds ---- */
+  .bg-primary {
+    background-color: rgb(var(--background));
+  }
+
+  .bg-secondary {
+    background-color: rgb(var(--background-secondary));
+  }
+
+  .bg-card {
+    background-color: rgb(var(--background-card));
+  }
+
+  /* ---- Text ---- */
+  .text-primary {
+    color: rgb(var(--foreground));
+  }
+
+  .text-muted {
+    color: rgb(var(--foreground-muted));
+  }
+
+  /* ---- Accents (text) ---- */
+  .accent-pink {
+    color: rgb(var(--accent-pink));
+  }
+
+  .accent-cyan {
+    color: rgb(var(--accent-cyan));
+  }
+
+  /* ---- Accent helpers (bg/border) using your naming ---- */
+  .border-accent-pink {
+    border-color: rgb(var(--accent-pink));
+  }
+
+  .border-accent-cyan {
+    border-color: rgb(var(--accent-cyan));
+  }
+
+  .bg-accent-pink {
+    background-color: rgb(var(--accent-pink));
+  }
+
+  .bg-accent-cyan {
+    background-color: rgb(var(--accent-cyan));
+  }
+
+  .text-accent-pink {
+    color: rgb(var(--accent-pink));
+  }
+
+  .text-accent-cyan {
+    color: rgb(var(--accent-cyan));
+  }
+
+  /* ---- Glow ---- */
+  .neon-pink {
+    text-shadow: 0 0 8px rgb(var(--accent-pink) / 0.6);
+  }
+
+  .neon-divider {
+    box-shadow: 0 0 12px rgb(var(--accent-pink) / 0.4);
+  }
+
+  .neon-hover:hover {
+    filter: drop-shadow(0 0 6px rgb(var(--accent-pink) / 0.6));
+  }
 }
