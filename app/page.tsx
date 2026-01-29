@@ -1,5 +1,6 @@
 
 import Header from "@/components/Header";
+import Hero from "@/components/HeroUI";
 import Value from "@/components/ValueProp";
 import Skills from "@/components/Skills";
 import Experience from "@/components/Experience";
@@ -13,6 +14,7 @@ export default function Home() {
       <main className="flex w-full min-h-screen flex-col items-start justify-between bg-black px-6 md:px-14 lg:px-20
 space-y-28">
           <Header />
+          <Hero />
           <Value />
           <Skills />
           <Experience />
