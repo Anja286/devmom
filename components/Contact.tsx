@@ -1,40 +1,134 @@
 // components/Contact.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type Status = "success" | "error";
+type ContactForm = { name: string; email: string; message: string };
+
+type ContactApiResponse = {
+  message?: string;
+  error?: string;
+};
+
+function isContactApiResponse(v: unknown): v is ContactApiResponse {
+  if (typeof v !== "object" || v === null) return false;
+  return "message" in v || "error" in v;
+}
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState<null | "success" | "error">(null);
+  const [form, setForm] = useState<ContactForm>({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [status, setStatus] = useState<Status | null>(null);
+  const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const trimmed = useMemo(
+    () => ({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    }),
+    [form]
+  );
+
+  const isValid = useMemo(() => {
+    return (
+      trimmed.name.length > 0 &&
+      trimmed.email.length > 0 &&
+      isValidEmail(trimmed.email) &&
+      trimmed.message.length > 0
+    );
+  }, [trimmed]);
+
+  useEffect(() => {
+    if (!status) return;
+
+    const t = setTimeout(() => {
+      setStatus(null);
+      setStatusMessage("");
+    }, 4500);
+
+    return () => clearTimeout(t);
+  }, [status]);
+
+  const setError = (msg: string) => {
+    setStatus("error");
+    setStatusMessage(msg);
+  };
+
+  const setSuccess = (msg: string) => {
+    setStatus("success");
+    setStatusMessage(msg);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (status) {
+      setStatus(null);
+      setStatusMessage("");
+    }
+
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
 
-    if (!form.name || !form.email || !form.message) {
-      setStatus("error");
+    if (!trimmed.name || !trimmed.email || !trimmed.message) {
+      setError("Please fill all fields.");
+      return;
+    }
+
+    if (!isValidEmail(trimmed.email)) {
+      setError("Please enter a valid email address.");
       return;
     }
 
     setLoading(true);
+    setStatus(null);
+    setStatusMessage("");
 
     try {
-      await fetch("/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(trimmed),
       });
 
-      setStatus("success");
+      let data: ContactApiResponse | null = null;
+      const contentType = res.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        const parsed: unknown = await res.json();
+        data = isContactApiResponse(parsed) ? parsed : null;
+      }
+
+      if (!res.ok) {
+        setError(
+          data?.error ||
+            data?.message ||
+            "Something went wrong. Please try again."
+        );
+        return;
+      }
+
+      setSuccess(data?.message || "Message sent successfully!");
       setForm({ name: "", email: "", message: "" });
     } catch {
-      setStatus("error");
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -71,6 +165,7 @@ export default function Contact() {
         <form
           onSubmit={handleSubmit}
           className="max-w-xl mx-auto flex flex-col gap-6"
+          aria-busy={loading}
         >
           <input
             type="text"
@@ -89,6 +184,7 @@ export default function Contact() {
               shadow-[0_0_10px_rgba(150,222,209,0.12)]
             "
             required
+            autoComplete="name"
           />
 
           <input
@@ -108,6 +204,8 @@ export default function Contact() {
               shadow-[0_0_10px_rgba(150,222,209,0.12)]
             "
             required
+            autoComplete="email"
+            inputMode="email"
           />
 
           <textarea
@@ -132,7 +230,7 @@ export default function Contact() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !isValid}
             className="
               bg-[#96DED1]
               hover:bg-[rgba(150,222,209,0.85)]
@@ -140,22 +238,26 @@ export default function Contact() {
               font-bold py-4 rounded-md uppercase tracking-wider
               transition-all duration-300
               shadow-[0_0_18px_rgba(150,222,209,0.35)]
-              disabled:opacity-50
+              disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
             {loading ? "Sending..." : "Send Message"}
           </button>
 
-          {status === "success" && (
-            <p className="text-emerald-300 mt-4">Message sent successfully!</p>
-          )}
-          {status === "error" && (
-            <p className="text-red-300 mt-4">Please fill all fields or try again.</p>
+          {status && (
+            <p
+              className={`mt-4 ${
+                status === "success" ? "text-emerald-300" : "text-red-300"
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              {statusMessage}
+            </p>
           )}
         </form>
       </div>
 
-      {/* subtle ambient mint glow */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 neon-mint-ambient" />
     </section>
   );

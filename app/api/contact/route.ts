@@ -1,47 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/contact/route.ts
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
 
-// Optional: if using Supabase email (or any email service)
-import { createClient } from "@supabase/supabase-js";
+export const runtime = "nodejs";
 
-// Initialize Supabase
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+type ContactBody = {
+  name?: string;
+  email?: string;
+  message?: string;
+};
 
-export async function POST(req: NextRequest) {
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, email, message } = body;
+    const body = (await req.json()) as ContactBody;
+
+    const name = (body.name ?? "").trim();
+    const email = (body.email ?? "").trim();
+    const message = (body.message ?? "").trim();
 
     if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Example: store in Supabase table "contacts"
-    const { error: dbError } = await supabase
-      .from("contacts")
-      .insert([{ name, email, message }]);
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    }
 
-    if (dbError) {
-      console.error("Supabase insert error:", dbError);
+    const apiKey = process.env.RESEND_API_KEY;
+    const toEmail = process.env.CONTACT_TO_EMAIL;
+
+    if (!apiKey || !toEmail) {
       return NextResponse.json(
-        { error: "Failed to save message" },
+        { error: "Server misconfigured (missing env vars)" },
         { status: 500 }
       );
     }
 
-    // Optional: send email using Supabase Functions or SMTP
-    // For now, we just store in DB
+    const resend = new Resend(apiKey);
 
-    return NextResponse.json({ message: "Contact submitted successfully" });
+    await resend.emails.send({
+      // For best deliverability, verify your domain in Resend and use:
+      // from: "Portfolio <hello@yourdomain.com>"
+      from: "Portfolio Contact <onboarding@resend.dev>",
+      to: [toEmail],
+      replyTo: email,
+      subject: `New message from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+    });
+
+    return NextResponse.json({ message: "Message sent successfully!" });
   } catch (err) {
-    console.error("Contact POST error:", err);
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    );
+    console.error("Contact route error:", err);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
