@@ -25,14 +25,14 @@ const projects: Project[] = [
     name: "MediMate software",
     description: "Patient care companion.",
     image: "/medimate.jpeg",
-    tech: ["React", "Node.js", "TypeScript", "Supabase", "React Native"],
+    tech: ["React", "Node.js", "JavaScript", "TypeScript","Tailwind", "Supabase", "React Native"],
     demo: "#",
     github: "https://github.com/Anja286/patient-care-companion#",
   },
  {
     name: "Learnflix Pro",
     description: "Full-stack learning app for healthcare providers.",
-    image: "/healthcare.jpeg",
+    image: "/medimate2.jpg",
     tech: ["Next.js", "AWS", "Typescript", "React", "React Native", "Node.js", "SASS"],
     demo: "#",
     github: "https://github.com/Anja286/learnflixpro",
@@ -76,7 +76,7 @@ export default function Projects() {
                 transition-shadow duration-300
               "
             >
-              <div className="relative w-full h-64">
+              <div className="relative object-cover w-full h-64">
                 <Image
                   src={project.image}
                   alt={project.name}
@@ -109,22 +109,7 @@ export default function Projects() {
                   ))}
                 </div>
 
-                <div className="flex gap-4 mt-4">
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="
-                      px-4 py-2 rounded font-bold
-                      bg-[#96DED1] text-[#0B1F1D]
-                      hover:bg-[rgba(150,222,209,0.85)]
-                      transition-colors duration-300
-                      shadow-[0_0_14px_rgba(150,222,209,0.35)]
-                    "
-                  >
-                    Demo
-                  </a>
-
+                <div className="flex justify-center mt-6">
                   <a
                     href={project.github}
                     target="_blank"
